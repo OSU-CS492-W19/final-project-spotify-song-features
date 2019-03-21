@@ -1,11 +1,26 @@
 package com.example.SpotifyFeatures;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
+import android.content.ContentProvider;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Cache;
+import com.android.volley.Network;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
@@ -17,6 +32,9 @@ import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String CLIENT_ID = "441cf4c355dd4b16ad08fb63bb9dc0aa";
@@ -24,10 +42,32 @@ public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = "http://evan-brass.github.io/spotify-app";
     private SpotifyAppRemote mSpotifyAppRemote;
 
+    private TextView centered_text;
+
+    private RequestQueue mRequestQueue;
+
+    private SpotifyViewModel mViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        centered_text = (TextView) findViewById(R.id.centered_text);
+
+        mViewModel = ViewModelProviders.of(this).get(SpotifyViewModel.class);
+
+        // Instantiate the cache
+        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+
+        // Set up the network to use HttpURLConnection as the HTTP client.
+        Network network = new BasicNetwork(new HurlStack());
+
+        // Instantiate the RequestQueue with the cache and network.
+        mRequestQueue = new RequestQueue(cache, network);
+
+        // Start the queue
+        mRequestQueue.start();
     }
 
     @Override
@@ -50,13 +90,43 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
 
             switch (response.getType()) {
                 // Response was successful and contains auth token
                 case TOKEN:
                     // Handle successful response
                     Log.d("MainActivity", "Received Token");
+                    final String token = response.getAccessToken();
+
+                    // Request a string response from the provided URL.
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                            "https://api.spotify.com/v1/me/playlists",
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    // Display the first 500 characters of the response string.
+                                    centered_text.setText("Response is: "+ response.substring(0,500));
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            centered_text.setText("That didn't work!");
+                        }
+                    }) {
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String>  params = new HashMap<String, String>();
+                            params.put("Authorization", "Bearer " + token);
+
+                            return params;
+                        }
+                    };
+
+                    // Add the request to the RequestQueue.
+                    mRequestQueue.add(stringRequest);
+
+
                     break;
 
                 // Auth flow returned an error

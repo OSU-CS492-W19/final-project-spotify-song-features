@@ -9,11 +9,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,6 +67,72 @@ public class SpotifyViewModel extends AndroidViewModel {
                                 ret.add(items.getJSONObject(i++));
                             }
                             playlists.setValue(ret);
+
+                        } catch(JSONException e) {
+                            // Pretend that all errors mean a problem with the token:
+                            token.setValue("");
+                        }
+                    }
+                },
+                new Response.ErrorListener(){
+                    @Override
+                    public void onErrorResponse(VolleyError error){
+                        // Pretend that all errors mean a problem with the token:
+                        token.setValue("");
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Bearer " + token.getValue());
+
+                return params;
+            }
+        };
+
+        // Add JsonObjectRequest to the RequestQueue
+        queue.add(jsonObjectRequest);
+    }
+
+    // Create a LiveData with a String
+    private MutableLiveData<ArrayList<JSONObject>> songs;
+    public MutableLiveData<ArrayList<JSONObject>> songs() {
+        if (songs == null) {
+            songs = new MutableLiveData<>();
+            songs.setValue(new ArrayList<JSONObject>());
+        }
+        return songs;
+    }
+    public void clearSongs() {
+        songs.setValue(new ArrayList<JSONObject>());
+    }
+    public void fetchSongs(final String url, final int count) {
+        if (url.equals("null")) {
+            return;
+        }
+        if (queue == null) {
+            queue = Volley.newRequestQueue(getApplication());
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                url + "",
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            ArrayList<JSONObject> ret = new ArrayList<>();
+
+                            JSONArray tracks = response.getJSONArray("items");
+                            int i = 0;
+                            while (tracks.optJSONObject(i) != null) {
+                                ret.add(tracks.getJSONObject(i++).getJSONObject("track"));
+                            }
+                            songs().setValue(ret);
+                            if (response.optString("next") != null) {
+                                fetchSongs(response.getString("next"), count);
+                            }
 
                         } catch(JSONException e) {
                             // Pretend that all errors mean a problem with the token:

@@ -15,28 +15,28 @@ import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Holder> {
-    ArrayList<JSONObject> data;
-    class Holder extends RecyclerView.ViewHolder {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongHolder> {
+    private ArrayList<JSONObject> data;
+
+    class SongHolder extends RecyclerView.ViewHolder {
         private TextView name;
-        public Holder(View v) {
+        private TextView artist;
+        private TextView album;
+        private features
+        public SongHolder(View v) {
             super(v);
             name = v.findViewById(R.id.name);
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    JSONObject tracks = data.get(getLayoutPosition()).optJSONObject("tracks");
-                    ListPlaylistsDirections.ShowPlaylist action = ListPlaylistsDirections
-                            .ShowPlaylist(tracks.optString("href"), tracks.optInt("total"));
-                    Navigation.findNavController(v).navigate(action);
-                }
-            });
+            name = v.findViewById(R.id.artist);
+            name = v.findViewById(R.id.album_name);
         }
         public void bind(JSONObject data) {
-            name.setText(data.optString("name"));
+            String name_val = data.optString("name");
+//            artist.setText(data.optJSONArray("artists").optJSONObject(0).optString("name"));
+            name.setText(name_val);
         }
     }
-    public PlaylistAdapter(Fragment owner, LiveData<ArrayList<JSONObject>> input) {
+
+    public SongAdapter(Fragment owner, LiveData<ArrayList<JSONObject>> input) {
         input.observe(owner, new Observer<ArrayList<JSONObject>>() {
             @Override
             public void onChanged(ArrayList<JSONObject> newData) {
@@ -56,14 +56,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Holder
     }
 
     @Override
-    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SongAdapter.SongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View itemView = inflater.inflate(R.layout.playlist_holder, parent, false);
-        return new Holder(itemView);
+        return new SongAdapter.SongHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(Holder holder, int position) {
+    public void onBindViewHolder(SongAdapter.SongHolder holder, int position) {
         holder.bind(data.get(position));
     }
 }

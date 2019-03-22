@@ -1,7 +1,9 @@
 package com.example.SpotifyFeatures;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.content.ContentProvider;
 import android.content.Intent;
@@ -51,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        centered_text = (TextView) findViewById(R.id.centered_text);
-
         mViewModel = ViewModelProviders.of(this).get(SpotifyViewModel.class);
 
         // Instantiate the cache
@@ -71,16 +71,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        // Request code will be used to verify if result comes from the login activity. Can be set to any integer.
-
-//        AuthenticationRequest.Builder builder =
-//                new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
-
-//        builder.setScopes(new String[]{"playlist-read-private"});
-//        AuthenticationRequest request = builder.build();
-
-//        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -97,45 +87,20 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("MainActivity", "Received Token");
                     final String token = response.getAccessToken();
 
-                    // Request a string response from the provided URL.
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET,
-                            "https://api.spotify.com/v1/me/playlists",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    // Display the first 500 characters of the response string.
-                                    centered_text.setText("Response is: "+ response.substring(0,500));
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            centered_text.setText("That didn't work!");
-                        }
-                    }) {
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String>  params = new HashMap<String, String>();
-                            params.put("Authorization", "Bearer " + token);
-
-                            return params;
-                        }
-                    };
-
-                    // Add the request to the RequestQueue.
-                    mRequestQueue.add(stringRequest);
-
-
+                    mViewModel.setToken(token);
                     break;
 
                 // Auth flow returned an error
                 case ERROR:
                     // Handle error response
                     Log.d("MainActivity", "Error getting Token");
+                    mViewModel.setToken("");
                     break;
 
                 // Most likely auth flow was cancelled
                 default:
                     // Handle other cases
+                    mViewModel.setToken("");
             }
         }
     }

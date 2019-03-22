@@ -2,35 +2,29 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PromptForLogin">
 
     <!-- TODO: Update blank fragment layout -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="234dp"
-            android:layout_height="138dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
             android:text="Tap bellow to start authorizing access to your playlists."
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:textSize="24sp"/>
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/authorize_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Authorize"
-            tools:layout_editor_absoluteX="161dp"
-            tools:layout_editor_absoluteY="341dp" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="43dp"
+            android:text="Authorize" />
+    </LinearLayout>
 
 </FrameLayout>

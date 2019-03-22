@@ -6,13 +6,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class SpotifyViewModel extends ViewModel {
-    private MutableLiveData<String> token;
+    private MutableLiveData<String> token = new MutableLiveData<>();
     public MutableLiveData<String> token() {
-        if (token == null) {
-            token = new MutableLiveData<>();
-            token.setValue("");
-        }
         return token;
+    }
+    public void setToken(String newVal) {
+        token.setValue(newVal);
     }
 
     // Create a LiveData with a String

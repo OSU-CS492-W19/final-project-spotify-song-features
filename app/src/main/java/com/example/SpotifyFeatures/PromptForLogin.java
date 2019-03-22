@@ -5,76 +5,73 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.spotify.sdk.android.authentication.AuthenticationClient;
+import com.spotify.sdk.android.authentication.AuthenticationRequest;
+import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * to handle interaction events.
- * Use the {@link PromptForLogin#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PromptForLogin extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String CLIENT_ID = "441cf4c355dd4b16ad08fb63bb9dc0aa";
+    private static final int REQUEST_CODE = 1337;
+    private static final String REDIRECT_URI = "http://evan-brass.github.io/spotify-app";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Button mAuthBtn;
+
+    private SpotifyViewModel mViewModel;
 
     public PromptForLogin() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PromptForLogin.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PromptForLogin newInstance(String param1, String param2) {
-        PromptForLogin fragment = new PromptForLogin();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_prompt_for_login, container, false);
-    }
+        View ret = inflater.inflate(R.layout.fragment_prompt_for_login, container, false);
+        mAuthBtn = ret.findViewById(R.id.authorize_btn);
+        mAuthBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AuthenticationRequest.Builder builder =
+                        new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+                builder.setScopes(new String[]{"playlist-read-private"});
+                AuthenticationRequest request = builder.build();
 
+                AuthenticationClient.openLoginActivity(getActivity(), REQUEST_CODE, request);
+            }
+        });
+        return ret;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mViewModel = ViewModelProviders.of(getActivity()).get(SpotifyViewModel.class);
 
+        final Fragment self = this;
+        mViewModel.token().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String newVal) {
+                if (!newVal.equals("")) {
+                    // Likely A request fell through meaning that the token expired - Get a new one
+                    NavHostFragment.findNavController(self).navigate(R.id.listPlaylists);
+                }
+            }
+        });
     }
 
     @Override
@@ -82,19 +79,4 @@ public class PromptForLogin extends Fragment {
         super.onDetach();
 
     }
-
-//    /**
-//     * This interface must be implemented by activities that contain this
-//     * fragment to allow an interaction in this fragment to be communicated
-//     * to the activity and potentially other fragments contained in that
-//     * activity.
-//     * <p>
-//     * See the Android Training lesson <a href=
-//     * "http://developer.android.com/training/basics/fragments/communicating.html"
-//     * >Communicating with Other Fragments</a> for more information.
-//     */
-//    public interface OnFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        void onFragmentInteraction(Uri uri);
-//    }
 }

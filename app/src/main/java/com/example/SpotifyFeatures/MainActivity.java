@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = "http://evan-brass.github.io/spotify-app";
     private SpotifyAppRemote mSpotifyAppRemote;
 
-    private TextView centered_text;
-
     private RequestQueue mRequestQueue;
 
     private SpotifyViewModel mViewModel;
@@ -53,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        centered_text = (TextView) findViewById(R.id.centered_text);
+//        centered_text = (TextView) findViewById(R.id.centered_text);
 
         mViewModel = ViewModelProviders.of(this).get(SpotifyViewModel.class);
 
@@ -76,13 +74,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Request code will be used to verify if result comes from the login activity. Can be set to any integer.
 
-        AuthenticationRequest.Builder builder =
-                new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
+//        AuthenticationRequest.Builder builder =
+//                new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
 
-        builder.setScopes(new String[]{"playlist-read-private"});
-        AuthenticationRequest request = builder.build();
+//        builder.setScopes(new String[]{"playlist-read-private"});
+//        AuthenticationRequest request = builder.build();
 
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+//        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {

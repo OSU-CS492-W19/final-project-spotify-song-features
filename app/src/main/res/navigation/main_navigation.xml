@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/main_navigation">
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/promptForLogin">
+    <fragment
+        android:id="@+id/promptForLogin"
+        android:name="com.example.SpotifyFeatures.PromptForLogin"
+        android:label="fragment_prompt_for_login"
+        tools:layout="@layout/fragment_prompt_for_login" >
+        <action
+            android:id="@+id/haveToken"
+            app:destination="@id/listPlaylists"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:launchSingleTop="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/listPlaylists"
+        android:name="com.example.SpotifyFeatures.ListPlaylists"
+        android:label="fragment_list_playlists"
+        tools:layout="@layout/fragment_list_playlists" />
+    <fragment
+        android:id="@+id/listSongs"
+        android:name="com.example.SpotifyFeatures.ListSongs"
+        android:label="fragment_list_songs"
+        tools:layout="@layout/fragment_list_songs" />
 </navigation>

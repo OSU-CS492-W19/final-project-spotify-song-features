@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Holder> {
@@ -22,6 +23,15 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Holder
         public Holder(View v) {
             super(v);
             name = v.findViewById(R.id.name);
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    JSONObject myData = data.get(getLayoutPosition());
+                    Navigation.findNavController(v)
+                            .navigate(ListPlaylistsDirections
+                                    .ShowPlaylist(myData.optString("href")));
+                }
+            });
         }
         public void bind(JSONObject data) {
             name.setText(data.optString("name"));

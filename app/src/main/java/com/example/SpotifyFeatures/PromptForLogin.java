@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.ActionOnlyNavDirections;
+import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
@@ -20,7 +22,7 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 public class PromptForLogin extends Fragment {
     private static final String CLIENT_ID = "441cf4c355dd4b16ad08fb63bb9dc0aa";
-    private static final int REQUEST_CODE = 1337;
+    public static final int REQUEST_CODE = 1337;
     private static final String REDIRECT_URI = "http://evan-brass.github.io/spotify-app";
 
     private Button mAuthBtn;
@@ -68,7 +70,8 @@ public class PromptForLogin extends Fragment {
             public void onChanged(String newVal) {
                 if (!newVal.equals("")) {
                     // Likely A request fell through meaning that the token expired - Get a new one
-                    NavHostFragment.findNavController(self).navigate(R.id.listPlaylists);
+                    NavDirections action = PromptForLoginDirections.haveToken();
+                    NavHostFragment.findNavController(self).navigate(action);
                 }
             }
         });

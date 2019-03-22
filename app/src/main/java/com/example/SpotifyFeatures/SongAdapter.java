@@ -3,6 +3,8 @@ package com.example.SpotifyFeatures;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -12,7 +14,6 @@ import java.util.ArrayList;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongHolder> {
@@ -21,13 +22,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongHolder> {
     class SongHolder extends RecyclerView.ViewHolder {
         private TextView name;
         private TextView artist;
-        private TextView album;
-        private features
+        private TextView album_name;
+        private ImageView album;
+        private LinearLayout features;
         public SongHolder(View v) {
             super(v);
             name = v.findViewById(R.id.name);
-            name = v.findViewById(R.id.artist);
-            name = v.findViewById(R.id.album_name);
+            artist = v.findViewById(R.id.artist);
+            album = v.findViewById(R.id.album);
+            album_name = v.findViewById(R.id.album_name);
+            features = v.findViewById(R.id.features_holder);
         }
         public void bind(JSONObject data) {
             String name_val = data.optString("name");
